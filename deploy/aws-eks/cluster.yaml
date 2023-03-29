@@ -1,0 +1,67 @@
+version: v0.7.0-benchmark3
+# Image pull policy, one of Always, Never, IfNotPresent. Defaults to Always.
+image_pull_policy: Always
+etcd:
+  # etcd service ports
+  ports:
+    client: 2379
+    peer: 2380
+  # etcd replicas is 3 by default, modification not supported
+  replicas: 3
+  # etcd storage size is 10Gi by default, supports both Gi and Mi units
+  storage_size: 10Gi
+  # specify the pvc storageclass of the etcd, use the cluster default storageclass by default
+  storage_class: local
+  # resources:
+  #   limits_cpu: 500m
+  #   limits_mem: 1Gi
+controller:
+  # controller service ports
+  ports:
+    controller: 2048
+    root_controller: 2021
+  # controller replicas is 2 by default, modification not supported
+  replicas: 2
+  # segment capacity is 64Mi by default, supports both Gi and Mi units
+  segment_capacity: 64Mi
+  resources:
+    limits_cpu: 1000m
+    limits_mem: 2Gi
+store:
+  replicas: 3
+  # store storage size is 10Gi by default, supports both Gi and Mi units
+  storage_size: 100Gi
+  # specify the pvc storageclass of the store, use the cluster default storageclass by default
+  storage_class: local
+  resources:
+    limits_cpu: 4000m
+    limits_mem: 4Gi
+gateway:
+  # gateway service ports
+  # gateway.ports.cloudevents specify the cloudevents port, the default value is gateway.ports.proxy+1 and customization is not supported
+  ports:
+    proxy: 8080
+    cloudevents: 8081
+  nodeports:
+    proxy: 30001
+    cloudevents: 30002
+  # gateway replicas is 1 by default, modification not supported
+  replicas: 1
+  resources:
+    limits_cpu: 8000m
+    limits_mem: 2Gi
+trigger:
+  replicas: 1
+  resources:
+    limits_cpu: 2000m
+    limits_mem: 2Gi
+timer:
+  # timer replicas is 2 by default, modification not supported
+  replicas: 2
+  timingwheel:
+    tick: 1
+    wheel_size: 32
+    layers: 4
+  resources:
+    limits_cpu: 500m
+    limits_mem: 1Gi

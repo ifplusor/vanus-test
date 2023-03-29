@@ -1,0 +1,15 @@
+apiVersion: tests.testkube.io/v3
+kind: Test
+metadata:
+  name: integration-pubsub
+  namespace: testkube
+spec:
+  type: vanus/integration-test
+  executionRequest:
+    args:
+      - pubsub
+    variables:
+      VANUS_GATEWAY:
+        name: VANUS_GATEWAY
+        type: basic
+        value: vanus-gateway.vanus:8080

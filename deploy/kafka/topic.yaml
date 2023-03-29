@@ -1,0 +1,13 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: benchmark
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: benchmark-cluster
+spec:
+  partitions: 100
+  replicas: 3
+  config:
+    retention.ms: 7200000
+    segment.bytes: 134217728

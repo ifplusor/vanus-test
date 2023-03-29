@@ -1,0 +1,12 @@
+apiVersion: executor.testkube.io/v1
+kind: Executor
+metadata:
+  name: vanus-test-executor
+  namespace: testkube
+spec:
+  executor_type: container
+  image: public.ecr.aws/vanus/vanus-test:latest
+  command:
+    - bin/vanus-integration
+  types:
+    - vanus/integration-test

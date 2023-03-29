@@ -1,0 +1,15 @@
+FROM --platform=$BUILDPLATFORM golang:1.20 as builder
+WORKDIR /workspace
+
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN go env -w GOPROXY=https://goproxy.cn,direct
+
+COPY . .
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH make build
+
+FROM --platform=$TARGETPLATFORM ubuntu:22.10
+WORKDIR /vanus-test
+
+COPY --from=builder /workspace/bin ./bin

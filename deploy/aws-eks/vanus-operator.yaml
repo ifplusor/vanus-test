@@ -1,0 +1,462 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: cores.vanus.ai
+spec:
+  group: vanus.ai
+  names:
+    kind: Core
+    listKind: CoreList
+    plural: cores
+    singular: core
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Core is the Schema for the cores API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: CoreSpec defines the desired state of Core
+              properties:
+                imagePullPolicy:
+                  description: ImagePullPolicy defines how the image is pulled
+                  type: string
+                resources:
+                  default:
+                    limits:
+                      cpu: 500m
+                      memory: 1024Mi
+                    requests:
+                      cpu: 250m
+                      memory: 512Mi
+                  description:
+                    The desired compute resource requirements of Pods in
+                    the cluster.
+                  properties:
+                    limits:
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                      description:
+                        "Limits describes the maximum amount of compute resources
+                        allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+                      type: object
+                    requests:
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                      description:
+                        "Requests describes the minimum amount of compute
+                        resources required. If Requests is omitted for a container,
+                        it defaults to Limits if that is explicitly specified, otherwise
+                        to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/"
+                      type: object
+                  type: object
+                version:
+                  description:
+                    Replicas is the Vanus cluster version. All components
+                    remain the same version.
+                  type: string
+              type: object
+            status:
+              description: CoreStatus defines the observed state of Core
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: connectors.vanus.ai
+spec:
+  group: vanus.ai
+  names:
+    kind: Connector
+    listKind: ConnectorList
+    plural: connectors
+    singular: connector
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Connector is the Schema for the connectors API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: ConnectorSpec defines the desired state of Connector
+              properties:
+                config:
+                  description: Config is the file of config.
+                  type: string
+                image:
+                  description:
+                    Image is the name of the controller docker image to use
+                    for the Pods. Must be provided together with ImagePullSecrets in
+                    order to use an image in a private registry.
+                  type: string
+                imagePullPolicy:
+                  description: ImagePullPolicy defines how the image is pulled
+                  type: string
+                kind:
+                  description: Kind is the kind of connector, support source/sink.
+                  type: string
+                name:
+                  description: Name is the name of connector.
+                  type: string
+                type:
+                  description: Type is the type of connector.
+                  type: string
+              type: object
+            status:
+              description: ConnectorStatus defines the observed state of Connector
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vanus
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: vanus-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/exec
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - statefulsets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - cores
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - cores/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - cores/spec
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - cores/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - connectors
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - connectors/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - connectors/spec
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - vanus.ai
+    resources:
+      - connectors/status
+    verbs:
+      - get
+      - patch
+      - update
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vanus-operator
+  namespace: vanus
+spec:
+  selector:
+    app: vanus-operator
+  type: LoadBalancer
+  ports:
+    - port: 8089
+      targetPort: 8089
+      # nodePort: 30009
+      name: proxy
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vanus-operator
+  namespace: vanus
+  annotations:
+    kubernetes.io/ingress.class: alb
+spec:
+  rules:
+    - host: vanus-operator.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: "vanus-operator"
+                port:
+                  number: 8089
+            pathType: Prefix
+            path: /
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vanus-operator
+  namespace: vanus
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vanus-operator
+subjects:
+  - kind: ServiceAccount
+    name: vanus-operator
+    namespace: vanus
+roleRef:
+  kind: ClusterRole
+  name: vanus-operator
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vanus-operator
+  namespace: vanus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vanus-operator
+  template:
+    metadata:
+      labels:
+        app: vanus-operator
+    spec:
+      serviceAccountName: vanus-operator
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: manager
+          # Replace this with the built image name
+          image: ifplusor/vanus-operator:benchmark2
+          imagePullPolicy: Always
+          command:
+            - /operator/manager
+          args:
+            - --leader-elect
+          securityContext:
+            allowPrivilegeEscalation: false
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "vanus-operator"
+        - name: apiserver
+          # Replace this with the built image name
+          image: ifplusor/vanus-operator:benchmark
+          imagePullPolicy: Always
+          ports:
+            - name: apiserver
+              containerPort: 8089
+          command:
+            - /operator/apiserver
+          securityContext:
+            allowPrivilegeEscalation: false
